@@ -1,18 +1,26 @@
 package com.soluction.resources;
 
 
-import java.util.ArrayList;
+
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.soluction.CategoriaServices;
+import com.soluction.exception.ObjectNotFoundException;
 import com.soluction.model.Categoria;
 
 @RestController
 @RequestMapping(value = "/categorias")
 public class CategoriaResource {
+	
+	@Autowired
+	 private CategoriaServices categoriaServices;
 
 	@RequestMapping(method = RequestMethod.GET, value = "/olamundo")
 	public String olaMundo() {
@@ -20,14 +28,22 @@ public class CategoriaResource {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/getcategoria")
-	public List<Categoria> getcategoria() {
+	public ResponseEntity<?> getcategoria() {
+		List<Categoria> lista = categoriaServices.getAll();
+		return ResponseEntity.ok().body(lista);
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/find/{id}")
+	public ResponseEntity<?> find(@PathVariable Long id) {
 		
-		List<Categoria> lista = new ArrayList<Categoria>();
-		lista.add(new Categoria(1,"Informatica"));
-		lista.add(new Categoria(2,"Escritório"));
-		return lista;
+		Categoria model = categoriaServices.findCategoria(id);
+		if(model == null) {
+			throw new ObjectNotFoundException("Objecto não encontrado");
+		}
+		return ResponseEntity.ok(model);
 		
 	}
+
 		
 	
 
